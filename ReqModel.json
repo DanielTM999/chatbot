@@ -1,0 +1,45 @@
+{
+    "/new/chat/inposition": {
+        "pergunta":"String",
+        "options": [
+            {
+                "opt": 1,
+                "res": "String"
+            },
+            {
+                "opt": 2,
+                "res": "String"
+            }
+        ],
+        "Priority": 0
+        
+    },
+    
+    "/new/chat/lastelement": {
+        "pergunta":"String",
+        "options": [
+            {
+                "opt": 1,
+                "res": "String"
+            },
+            {
+                "opt": 2,
+                "res": "String"
+            }
+        ],
+        "Priority": 0
+        
+    },
+
+    
+    "public/user/auth": {
+        "header": {
+            "Authorization": "String"
+        },
+
+        "cnpj":"String",
+	    "password":"String"
+    }
+
+
+}

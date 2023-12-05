@@ -27,11 +27,12 @@ public class SecurityConfig {
         return http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(authfilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(autorize -> autorize
                 .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/new/**").hasAuthority("BASIC")
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(authfilter, UsernamePasswordAuthenticationFilter.class)
         .build();
     }  
     

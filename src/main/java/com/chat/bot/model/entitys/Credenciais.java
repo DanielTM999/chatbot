@@ -47,10 +47,12 @@ public class Credenciais implements UserDetails{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if(isAdm){
-            return List.of(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("USER"));
+            return List.of(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("PLUS"), new SimpleGrantedAuthority("BASIC"));
+        }else if(plano > 1){
+            return List.of(new SimpleGrantedAuthority("PLUS"), new SimpleGrantedAuthority("BASIC"));
         }
         
-        return  List.of(new SimpleGrantedAuthority("USER"));
+        return  List.of(new SimpleGrantedAuthority("BASIC"));
     }
 
     @Override
