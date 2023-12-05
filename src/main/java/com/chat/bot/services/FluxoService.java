@@ -34,6 +34,18 @@ public class FluxoService {
         }
     }
 
+    public void CreateInPosition(Usuarios usuario, NodoFluxoDto dto, Map<Integer, String> mapType) throws ValidationException{
+        if(mapType == null){mapType = new HashMap<>();}
+        try {
+            UserConteisFluxo(usuario);
+            List<Fluxo> fluxo = getFluxoInOrder(usuario);
+            reorderFluxoList(fluxo, dto.getPriority());
+            createFluxo(dto, usuario, mapType, dto.getPriority());
+        } catch (ValidationException e) {
+            CreateFluxo_0(dto, usuario, mapType);
+        }
+    }
+
     private void UserConteisFluxo(Usuarios usuario) throws ValidationException{
         List<Fluxo> fluxo = getFluxo(usuario);
 
@@ -87,5 +99,22 @@ public class FluxoService {
         Collections.sort(fluxo);
 
         return fluxo;
+    }
+
+    private void reorderFluxoList(List<Fluxo> fluxo, Integer priorite){
+        if(priorite <= fluxo.size() && priorite >= 0){
+            for (int i = 0; i < fluxo.size(); i++) {
+                Fluxo thisFluxo = fluxo.get(i);
+                if(thisFluxo.getSequecia() == priorite){
+                    for (int j = i; j < fluxo.size(); j++) {
+                        Integer sequence = fluxo.get(j).getSequecia();
+                        sequence++;
+                        fluxo.get(j).setSequecia(sequence);
+                    }
+                }
+            }
+        }
+
+        repositorys.getFluxoRepository().saveAll(fluxo);
     }
 }

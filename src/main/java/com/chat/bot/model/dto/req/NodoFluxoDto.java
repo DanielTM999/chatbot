@@ -9,19 +9,20 @@ import lombok.Data;
 @Data
 @Builder
 public class NodoFluxoDto {
+    
     @NotEmpty(message = "a pergunta não pode ser vazia")
     private String pergunta;
 
     @NotEmpty(message = "a Lista de opção não pode ser vazia")
     private List<InnerNodoFluxoDto> options;
 
-    @NotEmpty(message = "a Priority não pode ser vazia")
+    @NotNull(message = "a Priority não pode ser nula")
     private Integer Priority;
 
     @Data
     @Builder
     public static class InnerNodoFluxoDto {
-        @NotEmpty(message = "a opt não pode ser vazia")
+        @NotNull(message = "a opt não pode ser nula")
         private Integer opt;
 
         @NotEmpty(message = "a res não pode ser vazia")
