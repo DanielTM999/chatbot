@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.chat.bot.model.dto.req.NodoFluxoDto;
@@ -44,6 +46,12 @@ public class FluxoService {
         } catch (ValidationException e) {
             CreateFluxo_0(dto, usuario, mapType);
         }
+    }
+
+    public void DeleteFromFluxo(Usuarios usuario, Long idFluxo) throws ValidationException{
+        UserConteisFluxo(usuario);
+        List<Fluxo> fluxo = getFluxoInOrder(usuario);
+        reorderDeleteFluxoList(fluxo, idFluxo);
     }
 
     private void UserConteisFluxo(Usuarios usuario) throws ValidationException{
@@ -116,5 +124,40 @@ public class FluxoService {
         }
 
         repositorys.getFluxoRepository().saveAll(fluxo);
+    }
+
+    private void reorderDeleteFluxoList(List<Fluxo> fluxo, Long id){
+        Optional<Fluxo> fluxoItem = getFluxoInList(id, fluxo);
+        if(fluxoItem.isPresent()){
+            for (int i = 0; i < fluxo.size(); i++) {
+                Fluxo thisFluxo = fluxo.get(i);
+                if(thisFluxo.getSequecia() == fluxoItem.get().getSequecia()){
+                    repositorys.getFluxoRepository().delete(thisFluxo);
+                    fluxo.remove(thisFluxo);
+                    for (int j = i; j < fluxo.size(); j++) {
+                        Integer sequence = fluxo.get(j).getSequecia();
+                        sequence--;
+                        fluxo.get(j).setSequecia(sequence);
+                    }
+                }
+            }
+        }
+
+        for (Fluxo fluxo2 : fluxo) {
+            log.infoLog(fluxo2);
+        }
+        
+        repositorys.getFluxoRepository().saveAll(fluxo);
+    }
+
+    private Optional<Fluxo> getFluxoInList(Long id, List<Fluxo> fluxo){
+        Fluxo respose = null;
+        for (Fluxo fluxo2 : fluxo) {
+            if(fluxo2.getId() == id){
+                respose = fluxo2;
+            }
+        }
+
+        return Optional.ofNullable(respose);
     }
 }

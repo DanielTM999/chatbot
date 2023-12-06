@@ -30,7 +30,7 @@ public class SecurityConfig {
             .addFilterBefore(authfilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(autorize -> autorize
                 .requestMatchers("/public/**").permitAll()
-                .requestMatchers("/new/**").hasAuthority("BASIC")
+                .requestMatchers("/chat/**").hasAuthority("BASIC")
                 .anyRequest().authenticated()
             )
         .build();
