@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.chat.bot.model.dto.req.WhatsAppBusinessAccountDto;
+import com.chat.bot.model.entitys.Fluxo;
 import com.chat.bot.model.entitys.Usuarios;
 import com.chat.bot.model.exceptions.ValidationException;
 import com.chat.bot.services.cache.NumberCash;
@@ -45,14 +46,9 @@ public class WhatsappService {
     
 
     public void next(Optional<Usuarios> user, Map<String, String> itens){
-        Integer sequnce = cash.getSequceNow(itens.get("number"));
+        Optional<Fluxo> fluxo = cash.getSequceNow(itens.get("number"));
         String msg = itens.get("message");
         
-        try {
-            varifySequeci(sequnce);
-        } catch (ValidationException e) {
-            
-        }
     }
 
     private void varifySequeci(Integer sequnce) throws ValidationException{

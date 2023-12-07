@@ -2,15 +2,17 @@ package com.chat.bot.services.cache;
 
 import java.time.Instant;
 
+import com.chat.bot.model.entitys.Fluxo;
+
 import lombok.Data;
 
 @Data
 public class CashUser {
-    private Integer sequenceUser;
+    private Fluxo fluxo;
     private Instant UtilLife;
 
-    public CashUser(Integer sequenceUser){
-        this.sequenceUser = sequenceUser;
+    public CashUser(Fluxo fluxo){
+        this.fluxo = fluxo;
         this.UtilLife = Instant.now().plusSeconds(60);
     }
 }

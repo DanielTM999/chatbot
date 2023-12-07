@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Fluxo implements Comparable<Fluxo>{
+public class Fluxo {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,32 +24,23 @@ public class Fluxo implements Comparable<Fluxo>{
     @ElementCollection
     @CollectionTable(name = "fluxo_resposta", joinColumns = @JoinColumn(name = "fluxo_id"))
     @MapKeyColumn(name = "ordem")
-    @Column(name = "resposta")
-    private Map<Integer, String> resposta;
-
-    @Column(nullable = false)
-    private Integer sequecia;
+    @Column(name = "resposta", nullable = true)
+    private Map<Integer, Fluxo> resposta;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @JoinColumn(name = "usuario_id", nullable = true)
     private Usuarios usuario;
     
     @Override
-    public int compareTo(Fluxo outroFluxo) {
-        return Integer.compare(this.sequecia, outroFluxo.sequecia);
-    }
-
-    @Override
     public String toString() {
-        return "Fluxo [id=" + id + ", pergunta=" + pergunta + ", resposta=" + resposta + ", sequecia=" + sequecia + ", usuario="+ usuario.getCnpj()+"]";
+        return "Fluxo [id=" + id + ", pergunta=" + pergunta + ", resposta=" + resposta + ", usuario="+ usuario.getCnpj()+"]";
     }
     
     @Data
     public static class Builder{
         private Long id;
         private String pergunta;
-        private Map<Integer, String> resposta;
-        private Integer sequecia;
+        private Map<Integer, Fluxo> resposta;
         private Usuarios usuario;
 
         public Builder pergunta(Long id) {
@@ -62,13 +53,8 @@ public class Fluxo implements Comparable<Fluxo>{
             return this;
         }
 
-        public Builder resposta(Map<Integer, String> resposta) {
+        public Builder resposta(Map<Integer, Fluxo> resposta) {
             this.resposta = resposta;
-            return this;
-        }
-
-        public Builder sequecia(Integer sequecia) {
-            this.sequecia = sequecia;
             return this;
         }
 
@@ -78,7 +64,7 @@ public class Fluxo implements Comparable<Fluxo>{
         }
 
         public Fluxo build() {
-            return new Fluxo(id, pergunta, resposta, sequecia, usuario);
+            return new Fluxo(id, pergunta, resposta, usuario);
         }
     }
 

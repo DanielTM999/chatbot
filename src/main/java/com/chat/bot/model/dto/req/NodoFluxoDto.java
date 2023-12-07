@@ -13,11 +13,14 @@ public class NodoFluxoDto {
     @NotEmpty(message = "a pergunta não pode ser vazia")
     private String pergunta;
 
+    @NotNull(message = "a Priority não pode ser nula")
+    private Long Priority;
+
+    @NotNull(message = "o ID do pos inserido não pode ser vazio")
+    private Integer opt;
+
     @NotEmpty(message = "a Lista de opção não pode ser vazia")
     private List<InnerNodoFluxoDto> options;
-
-    @NotNull(message = "a Priority não pode ser nula")
-    private Integer Priority;
 
     @Data
     @Builder

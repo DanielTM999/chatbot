@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.chat.bot.model.dto.req.NodoFluxoDto;
@@ -24,24 +23,11 @@ public class FluxoService {
 
     @Autowired
     private Logger log;
-    
-    public void CreateFluxInLast(Usuarios usuario, NodoFluxoDto dto, Map<Integer, String> mapType){
-        if(mapType == null){mapType = new HashMap<>();}
-        try {
-            UserConteisFluxo(usuario);
-            List<Fluxo> fluxo = getFluxoInOrder(usuario);
-            createFluxo(dto, usuario, mapType, fluxo.size());
-        } catch (ValidationException e) {
-            CreateFluxo_0(dto, usuario, mapType);
-        }
-    }
 
-    public void CreateInPosition(Usuarios usuario, NodoFluxoDto dto, Map<Integer, String> mapType) throws ValidationException{
+    public void CreateInPosition(Usuarios usuario, NodoFluxoDto dto, Map<Integer, Fluxo> mapType) throws ValidationException{
         if(mapType == null){mapType = new HashMap<>();}
         try {
             UserConteisFluxo(usuario);
-            List<Fluxo> fluxo = getFluxoInOrder(usuario);
-            reorderFluxoList(fluxo, dto.getPriority());
             createFluxo(dto, usuario, mapType, dto.getPriority());
         } catch (ValidationException e) {
             CreateFluxo_0(dto, usuario, mapType);
@@ -50,8 +36,7 @@ public class FluxoService {
 
     public void DeleteFromFluxo(Usuarios usuario, Long idFluxo) throws ValidationException{
         UserConteisFluxo(usuario);
-        List<Fluxo> fluxo = getFluxoInOrder(usuario);
-        reorderDeleteFluxoList(fluxo, idFluxo);
+        
     }
 
     private void UserConteisFluxo(Usuarios usuario) throws ValidationException{
@@ -62,102 +47,74 @@ public class FluxoService {
         }
     }
 
-    private void CreateFluxo_0(NodoFluxoDto dto, Usuarios usuario, Map<Integer, String> map){
-        Map<Integer, String> opt = map; 
+    private void CreateFluxo_0(NodoFluxoDto dto, Usuarios usuario, Map<Integer, Fluxo> map){
+        Map<Integer, Fluxo> opt = map; 
 
         for (InnerNodoFluxoDto element : dto.getOptions()) {
-            opt.put(element.getOpt(), element.getRes());
+            Fluxo nodo = new Fluxo.Builder()
+                .pergunta(element.getRes())
+                .usuario(usuario)
+            .build();
+            repositorys.getFluxoRepository().save(nodo);
+            opt.put(element.getOpt(), nodo);
         }
 
-        Fluxo fluxo = new Fluxo.Builder()
-            .pergunta(dto.getPergunta())
-            .resposta(opt)
-            .sequecia(0)
-            .usuario(usuario)
-        .build();
+        Fluxo fluxo = createNewFluxo(dto.getPergunta(), opt, usuario);
 
         log.saveLog(fluxo);
         repositorys.getFluxoRepository().save(fluxo);
     }
 
-    private void createFluxo(NodoFluxoDto dto, Usuarios usuario, Map<Integer, String> map, Integer priority){
-        Map<Integer, String> opt = map; 
+    private void createFluxo(NodoFluxoDto dto, Usuarios usuario, Map<Integer, Fluxo> map, Long id){
+        Map<Integer, Fluxo> opt = map; 
+        try {
+            verifyID(id, usuario);
+            for (InnerNodoFluxoDto element : dto.getOptions()) {
+                Fluxo nodo = new Fluxo.Builder()
+                    .pergunta(element.getRes())
+                    .usuario(usuario)
+                .build();
+                repositorys.getFluxoRepository().save(nodo);
+                opt.put(element.getOpt(), nodo);
+            }
 
-        for (InnerNodoFluxoDto element : dto.getOptions()) {
-            opt.put(element.getOpt(), element.getRes());
+            Fluxo Newfluxo = createNewFluxo(dto.getPergunta(), opt, usuario);
+            repositorys.getFluxoRepository().save(Newfluxo);
+
+            Optional<Fluxo> fluxoOption = repositorys.getFluxoRepository().findById(id);
+            Fluxo fluxo = fluxoOption.get();
+            fluxo.getResposta().put(dto.getOpt(), Newfluxo);
+            repositorys.getFluxoRepository().save(fluxo);  
+
+        } catch (ValidationException e) {
+            log.ErrorLog(e.getMessage());
         }
-
-        Fluxo fluxo = new Fluxo.Builder()
-            .pergunta(dto.getPergunta())
-            .resposta(opt)
-            .sequecia(priority)
-            .usuario(usuario)
-        .build();
-
-        log.saveLog(fluxo);
-        repositorys.getFluxoRepository().save(fluxo);  
     }
 
     private List<Fluxo> getFluxo(Usuarios usuario){
         return repositorys.getFluxoRepository().findByUsuario(usuario);
     }
 
-    private List<Fluxo> getFluxoInOrder(Usuarios usuario){
-        List<Fluxo> fluxo = getFluxo(usuario);
-        Collections.sort(fluxo);
+    private void verifyID(Long id, Usuarios user) throws ValidationException{
 
-        return fluxo;
-    }
+        Optional<Fluxo> element = repositorys.getFluxoRepository().findById(id);
 
-    private void reorderFluxoList(List<Fluxo> fluxo, Integer priorite){
-        if(priorite <= fluxo.size() && priorite >= 0){
-            for (int i = 0; i < fluxo.size(); i++) {
-                Fluxo thisFluxo = fluxo.get(i);
-                if(thisFluxo.getSequecia() == priorite){
-                    for (int j = i; j < fluxo.size(); j++) {
-                        Integer sequence = fluxo.get(j).getSequecia();
-                        sequence++;
-                        fluxo.get(j).setSequecia(sequence);
-                    }
-                }
-            }
+        if(!element.isPresent()){
+            throw new ValidationException("sem fluxo");
         }
 
-        repositorys.getFluxoRepository().saveAll(fluxo);
-    }
-
-    private void reorderDeleteFluxoList(List<Fluxo> fluxo, Long id){
-        Optional<Fluxo> fluxoItem = getFluxoInList(id, fluxo);
-        if(fluxoItem.isPresent()){
-            for (int i = 0; i < fluxo.size(); i++) {
-                Fluxo thisFluxo = fluxo.get(i);
-                if(thisFluxo.getSequecia() == fluxoItem.get().getSequecia()){
-                    repositorys.getFluxoRepository().delete(thisFluxo);
-                    fluxo.remove(thisFluxo);
-                    for (int j = i; j < fluxo.size(); j++) {
-                        Integer sequence = fluxo.get(j).getSequecia();
-                        sequence--;
-                        fluxo.get(j).setSequecia(sequence);
-                    }
-                }
-            }
-        }
-
-        for (Fluxo fluxo2 : fluxo) {
-            log.infoLog(fluxo2);
+        Usuarios userfluxo = element.get().getUsuario();
+        if(!userfluxo.equals(user)){
+            throw new ValidationException("sem fluxo");
         }
         
-        repositorys.getFluxoRepository().saveAll(fluxo);
     }
 
-    private Optional<Fluxo> getFluxoInList(Long id, List<Fluxo> fluxo){
-        Fluxo respose = null;
-        for (Fluxo fluxo2 : fluxo) {
-            if(fluxo2.getId() == id){
-                respose = fluxo2;
-            }
-        }
-
-        return Optional.ofNullable(respose);
+    private Fluxo createNewFluxo(String pergunta, Map<Integer, Fluxo> opt, Usuarios usuario){
+        return new Fluxo.Builder()
+            .pergunta(pergunta)
+            .resposta(opt)
+            .usuario(usuario)
+        .build();
     }
 }

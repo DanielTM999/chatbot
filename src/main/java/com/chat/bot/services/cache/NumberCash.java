@@ -4,7 +4,11 @@ package com.chat.bot.services.cache;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
+
+import com.chat.bot.model.entitys.Fluxo;
 import com.chat.bot.services.log.Logger;
 
 @Service
@@ -17,25 +21,21 @@ public class NumberCash {
         }
     }
 
-    public void addOrNextNumberToCash(String number){
+    public void addOrNextNumberToCash(String number, Integer next){
         instanceMapIfNecessary(new HashMap<>());
-        addOrNext(number);
+        addOrNext(number, next);
     }
 
-    public Integer getSequceNow(String number){
+    public Optional<Fluxo> getSequceNow(String number){
         instanceMapIfNecessary(new HashMap<>());
         CashUser val = cash.get(number);
-        Integer sequnce = 0;
+        Fluxo fluxo = null;
         if(val != null){
-            sequnce = val.getSequenceUser();
-        }else{
-            addOrNextNumberToCash(number);
-            sequnce = getSequceNow(number);
+            fluxo = val.getFluxo();
         }
 
-        return sequnce;
+        return Optional.ofNullable(fluxo);
     }
-
 
     private void instanceMapIfNecessary(Map<String, CashUser> maptypecash){
         if(cash == null){
@@ -43,24 +43,26 @@ public class NumberCash {
         }
     }
 
-    private void addOrNext(String number){
+    private void addOrNext(String number, Integer next){
         if(cash.containsKey(number)){
-            next(number);
+            next(number, next);
         }else{
             add(number);
         }
     }
 
+    //add o fluxo(buscar por init)
     private void add(String number){
-        Integer init = 0;
-        CashUser newUser = new CashUser(init);
+        Fluxo fluxo = null;
+        CashUser newUser = new CashUser(fluxo);
         cash.put(number, newUser);
     }
 
-    private void next(String number){
-        Integer sequnce = cash.get(number).getSequenceUser();
-        sequnce++;
-        cash.get(number).setSequenceUser(sequnce);
+    private void next(String number, Integer next){
+        if(cash.get(number).getFluxo().getResposta().containsKey(next)){       
+            Fluxo fluxo = cash.get(number).getFluxo().getResposta().get(next);
+            cash.get(number).setFluxo(fluxo);
+        }
     }
 
     private static boolean remove(CashUser cashUser, Logger log, String number){

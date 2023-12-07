@@ -32,18 +32,7 @@ public class ChatController {
     @Autowired
     private Services services;
     
-    @PostMapping("/new/lastelement")
-    public ResponseEntity<?> novoElemento(@RequestBody @Valid NodoFluxoDto dto, BindingResult bindingResult, HttpServletRequest request){
-        try {
-            services.getValidation().isValid(bindingResult);
-            Optional<Usuarios> user = extractor.extractDataUser(request);
-            services.getFluxoService().CreateFluxInLast(user.get(), dto, null);
-            return ResponseEntity.ok().build();
-        } catch (ValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorRes(e.getMessage()));
-        } 
-    }
-
+    
     @PostMapping("/new/inposition")
     public ResponseEntity<?> novoElementoInPosition(@RequestBody @Valid NodoFluxoDto dto, BindingResult bindingResult, HttpServletRequest request){
         try {
