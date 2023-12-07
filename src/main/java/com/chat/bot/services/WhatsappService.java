@@ -51,7 +51,7 @@ public class WhatsappService {
         try {
             varifySequeci(sequnce);
         } catch (ValidationException e) {
-            // TODO: handle exception
+            
         }
     }
 
