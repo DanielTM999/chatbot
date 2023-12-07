@@ -25,6 +25,11 @@ public class CredentialsExtractor {
         return validate(token.get());
     }
 
+    public Optional<Usuarios> extractDataUserByNumber(String mainNumber){
+        Usuarios user = repositorys.getUsuariosRepository().findByMainNumber(mainNumber);
+        return Optional.ofNullable(user);
+    }
+
     private Optional<String> extractToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         return Optional.ofNullable(token);

@@ -30,6 +30,7 @@ public class SecurityConfig {
             .addFilterBefore(authfilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(autorize -> autorize
                 .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/webhook/**").permitAll()
                 .requestMatchers("/chat/**").hasAuthority("BASIC")
                 .anyRequest().authenticated()
             )

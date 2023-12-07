@@ -10,4 +10,5 @@ import com.chat.bot.model.entitys.Usuarios;
 public interface UsuariosRepository extends JpaRepository<Usuarios, Long>{
     Usuarios findByCnpj(String cnpj);  
     Usuarios findByCredenciais(Credenciais credenciais);
+    Usuarios findByMainNumber(String mainNumber);
 }

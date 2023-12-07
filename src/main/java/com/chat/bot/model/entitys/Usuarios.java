@@ -28,6 +28,9 @@ public class Usuarios {
    @Column(nullable = false)
    private String mainNumber;
 
+   @Column(nullable = false)
+   private String mainDDD;
+
    @OneToOne(cascade = CascadeType.ALL)
    @JoinColumn(name = "credenciais_id")
    private Credenciais credenciais;

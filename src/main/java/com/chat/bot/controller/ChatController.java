@@ -57,12 +57,13 @@ public class ChatController {
     }
 
     @DeleteMapping("/del/chat/{id}")
-    public void deleteByid(@PathVariable String id, HttpServletRequest request){
+    public ResponseEntity<?> deleteByid(@PathVariable String id, HttpServletRequest request){
         Optional<Usuarios> user = extractor.extractDataUser(request);
         try {
             services.getFluxoService().DeleteFromFluxo(user.get(), Long.parseLong(id));
+            return ResponseEntity.ok().build();
         } catch (NumberFormatException | ValidationException e) {
-            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorRes(e.getMessage()));
         }
         
     }
