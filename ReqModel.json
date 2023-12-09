@@ -37,7 +37,7 @@
                             "contacts": [
                                 {
                                     "profile": {
-                                        "name": "John Doe"
+                                        "name": "String"
                                     },
                                     "wa_id": "1234567890"
                                 }
