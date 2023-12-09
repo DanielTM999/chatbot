@@ -1,6 +1,8 @@
 {
     "/new/chat/inposition": {
         "pergunta":"String",
+        "Priority": 0,
+        "opt": 0,
         "options": [
             {
                 "opt": 1,
@@ -10,36 +12,52 @@
                 "opt": 2,
                 "res": "String"
             }
-        ],
-        "Priority": 0
-        
+        ]
     },
-    
-    "/new/chat/lastelement": {
-        "pergunta":"String",
-        "options": [
-            {
-                "opt": 1,
-                "res": "String"
-            },
-            {
-                "opt": 2,
-                "res": "String"
-            }
-        ],
-        "Priority": 0
-        
-    },
-
-    
     "public/user/auth": {
         "header": {
             "Authorization": "String"
         },
-
-        "cnpj":"String",
-	    "password":"String"
+        "cnpj": "String",
+        "password": "String"
+    },
+    "Reposta do whts app? /webhook/'number'": {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+                "id": "WHATSAPP_BUSINESS_ACCOUNT_ID",
+                "changes": [
+                    {
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "metadata": {
+                                "display_phone_number": "String(number)",
+                                "phone_number_id": "PHONE_NUMBER_ID"
+                            },
+                            "contacts": [
+                                {
+                                    "profile": {
+                                        "name": "John Doe"
+                                    },
+                                    "wa_id": "1234567890"
+                                }
+                            ],
+                            "messages": [
+                                {
+                                    "from": "1234567890",
+                                    "id": "wamid.123",
+                                    "timestamp": 1642345678000,
+                                    "text": {
+                                        "body": "0"
+                                    },
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "field": "messages"
+                    }
+                ]
+            }
+        ]
     }
-
-
 }
