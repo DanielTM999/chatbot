@@ -14,6 +14,8 @@ import com.chat.bot.model.exceptions.ValidationException;
 import com.chat.bot.model.repositories.Repositorys;
 import com.chat.bot.services.log.Logger;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class FluxoService {
 
@@ -35,7 +37,7 @@ public class FluxoService {
 
     public void DeleteFromFluxo(Usuarios usuario, Long idFluxo) throws ValidationException{
         UserConteisFluxo(usuario);
-        
+        delete(usuario, idFluxo);
     }
 
     private void UserConteisFluxo(Usuarios usuario) throws ValidationException{
@@ -44,6 +46,27 @@ public class FluxoService {
         if(fluxo.isEmpty()){
             throw new ValidationException("lista vazia");
         }
+    }
+
+    private void delete(Usuarios usuario, Long idFluxo) throws ValidationException{
+        String error = "Fluxo não encontrado";
+        Optional<Fluxo> fluxoToDelete = repositorys.getFluxoRepository().findById(idFluxo);
+        if(fluxoToDelete.isPresent()){
+            Fluxo element = fluxoToDelete.get();
+            if(element.getUsuario().equals(usuario)){
+                removeAll(element.getResposta());
+                deleteThis(element);
+                return;
+            }else if(element.getUsuario().getCredenciais().isAdm()){
+                removeAll(element.getResposta());
+                deleteThis(element);
+                return;
+            }
+            error = "você não ten permissao para excluir esse fluxo de dados";
+            throw new ValidationException(error);
+        }
+
+        throw new ValidationException(error);
     }
 
     private void CreateFluxo_0(NodoFluxoDto dto, Usuarios usuario, Map<Integer, Fluxo> map){
@@ -118,5 +141,25 @@ public class FluxoService {
             .init(init)
             .usuario(usuario)
         .build();
+    }
+
+    @Transactional()
+    private void removeAll(Map<Integer, Fluxo> dta){
+        for (Integer chave : dta.keySet()){
+            Fluxo del = dta.get(chave);
+            if(del.getResposta() == null || del.getResposta().isEmpty()){
+                repositorys.getGenericRepository().excluirGeneric(del.getId());
+                repositorys.getFluxoRepository().delete(del);
+                return;
+            }else{
+                removeAll(del.getResposta());
+            }
+        }
+    }
+
+    @Transactional()
+    private void deleteThis(Fluxo fluxo){
+        repositorys.getGenericRepository().excluirGeneric(fluxo.getId());
+        repositorys.getFluxoRepository().delete(fluxo);
     }
 }

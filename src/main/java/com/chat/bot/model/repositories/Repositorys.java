@@ -17,4 +17,7 @@ public class Repositorys {
     @Autowired
     private FluxoRepository fluxoRepository;
 
+    @Autowired
+    private GenericRepository genericRepository;
+
 }

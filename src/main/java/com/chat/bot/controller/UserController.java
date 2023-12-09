@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.chat.bot.model.dto.req.AuthAdmDto;
 import com.chat.bot.model.dto.req.AuthDto;
 import com.chat.bot.model.dto.res.JwtRes;
 import com.chat.bot.services.Services;
@@ -29,6 +30,12 @@ public class UserController {
             services.getLog().ErrorLog(e.getMessage(), req.getClass());
             return ResponseEntity.badRequest().body(new JwtRes(null, e.getMessage()));
         }
+    }
+
+
+    @PostMapping("/auth/adm")
+    public void authorizationAdm(@Valid @RequestBody AuthAdmDto req, BindingResult bindingResult){
+
     }
 
 }
