@@ -19,7 +19,6 @@ public class NodoFluxoDto {
     @NotNull(message = "o ID do pos inserido não pode ser vazio")
     private Integer opt;
 
-    @NotEmpty(message = "a Lista de opção não pode ser vazia")
     private List<InnerNodoFluxoDto> options;
 
     @Data

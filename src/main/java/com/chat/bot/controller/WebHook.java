@@ -28,10 +28,10 @@ public class WebHook {
     
 
     @GetMapping("/webhook/{number}")
-    public void webHook(@PathVariable(name = "number") String number, @RequestBody WhatsAppBusinessAccountDto dto){
+    public String webHook(@PathVariable(name = "number") String number, @RequestBody WhatsAppBusinessAccountDto dto){
         Optional<Usuarios> user = extractor.extractDataUserByNumber(number); 
         Map<String, String> msg = whatsappService.getLatestMessageBody(dto);
-        whatsappService.next(user, msg);
-        
+        String resposta = whatsappService.next(user, msg);
+        return resposta;
     }
 }

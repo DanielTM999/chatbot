@@ -21,11 +21,14 @@ public class Fluxo {
     @Column(nullable = false)
     private String pergunta;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "fluxo_resposta", joinColumns = @JoinColumn(name = "fluxo_id"))
     @MapKeyColumn(name = "ordem")
     @Column(name = "resposta", nullable = true)
     private Map<Integer, Fluxo> resposta;
+
+    @Column(nullable = false)
+    private boolean init;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = true)
@@ -41,6 +44,7 @@ public class Fluxo {
         private Long id;
         private String pergunta;
         private Map<Integer, Fluxo> resposta;
+        private boolean init;
         private Usuarios usuario;
 
         public Builder pergunta(Long id) {
@@ -63,8 +67,13 @@ public class Fluxo {
             return this;
         }
 
+        public Builder init(boolean init) {
+            this.init = init;
+            return this;
+        }
+
         public Fluxo build() {
-            return new Fluxo(id, pergunta, resposta, usuario);
+            return new Fluxo(id, pergunta, resposta, init, usuario);
         }
     }
 

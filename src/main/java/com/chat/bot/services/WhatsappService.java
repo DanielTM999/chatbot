@@ -7,15 +7,16 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.chat.bot.model.dto.req.WhatsAppBusinessAccountDto;
-import com.chat.bot.model.entitys.Fluxo;
 import com.chat.bot.model.entitys.Usuarios;
+import com.chat.bot.model.exceptions.NotFoundElementException;
 import com.chat.bot.model.exceptions.ValidationException;
+import com.chat.bot.services.cache.CashUser;
 import com.chat.bot.services.cache.NumberCash;
 
 @Service
 public class WhatsappService {
+    private String[] reservado = {"redirectTo:|//?|{}"};
 
     @Autowired
     private NumberCash cash;
@@ -45,16 +46,33 @@ public class WhatsappService {
 
     
 
-    public void next(Optional<Usuarios> user, Map<String, String> itens){
-        Optional<Fluxo> fluxo = cash.getSequceNow(itens.get("number"));
-        String msg = itens.get("message");
+    public String next(Optional<Usuarios> user, Map<String, String> itens){
+        String number = itens.get("number");
+        Integer resposta = Integer.parseInt(itens.get("message"));
+        try {
+            cash.addOrNextNumberToCash(number, resposta, user);
+            CashUser cashUser = cash.getCashUser(number);
+            String respostaCliente = cashUser.getFluxo().getPergunta();
+            if(isRedirect(respostaCliente)){
+                //fazer o redirecionamento(Faço depois)
+            }
+            return cashUser.getFluxo().getPergunta();
+        } catch (NotFoundElementException | ValidationException e) {
+            return e.getMessage();
+        }
         
     }
-
-    private void varifySequeci(Integer sequnce) throws ValidationException{
-        if(sequnce == 0){throw new ValidationException("Valor 0");}
-    }
-
     
+    private boolean isRedirect(String value){
+        int InitString = 0;
+        int FinalString = 14;
+        try {
+            String extract = value.substring(InitString, FinalString);
+            String expected = reservado[0].substring(InitString, FinalString);
+            return extract.equalsIgnoreCase(expected);
+        } catch (StringIndexOutOfBoundsException e) {
+            return false;
+        }
+    }
     
 }

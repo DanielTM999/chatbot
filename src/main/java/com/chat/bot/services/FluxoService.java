@@ -1,6 +1,5 @@
 package com.chat.bot.services;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,13 +52,14 @@ public class FluxoService {
         for (InnerNodoFluxoDto element : dto.getOptions()) {
             Fluxo nodo = new Fluxo.Builder()
                 .pergunta(element.getRes())
+                .init(false)
                 .usuario(usuario)
             .build();
             repositorys.getFluxoRepository().save(nodo);
             opt.put(element.getOpt(), nodo);
         }
 
-        Fluxo fluxo = createNewFluxo(dto.getPergunta(), opt, usuario);
+        Fluxo fluxo = createNewFluxo(dto.getPergunta(), opt, usuario, true);
 
         log.saveLog(fluxo);
         repositorys.getFluxoRepository().save(fluxo);
@@ -72,13 +72,14 @@ public class FluxoService {
             for (InnerNodoFluxoDto element : dto.getOptions()) {
                 Fluxo nodo = new Fluxo.Builder()
                     .pergunta(element.getRes())
+                    .init(false)
                     .usuario(usuario)
                 .build();
                 repositorys.getFluxoRepository().save(nodo);
                 opt.put(element.getOpt(), nodo);
             }
 
-            Fluxo Newfluxo = createNewFluxo(dto.getPergunta(), opt, usuario);
+            Fluxo Newfluxo = createNewFluxo(dto.getPergunta(), opt, usuario, false);
             repositorys.getFluxoRepository().save(Newfluxo);
 
             Optional<Fluxo> fluxoOption = repositorys.getFluxoRepository().findById(id);
@@ -110,10 +111,11 @@ public class FluxoService {
         
     }
 
-    private Fluxo createNewFluxo(String pergunta, Map<Integer, Fluxo> opt, Usuarios usuario){
+    private Fluxo createNewFluxo(String pergunta, Map<Integer, Fluxo> opt, Usuarios usuario, boolean init){
         return new Fluxo.Builder()
             .pergunta(pergunta)
             .resposta(opt)
+            .init(init)
             .usuario(usuario)
         .build();
     }

@@ -11,6 +11,7 @@ import com.chat.bot.model.entitys.Usuarios;
 @Repository
 public interface FluxoRepository extends JpaRepository<Fluxo, Long>{
     Fluxo findByPergunta(String pergunta);
-    Fluxo findBySequecia(Integer sequecia);
+    Fluxo findByUsuarioAndInit(Usuarios usuario, boolean init);
+    List<Fluxo> findByInit(boolean init);
     List<Fluxo> findByUsuario(Usuarios usuario);
 }

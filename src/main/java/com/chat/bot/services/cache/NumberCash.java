@@ -6,13 +6,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.chat.bot.model.entitys.Fluxo;
+import com.chat.bot.model.entitys.Usuarios;
+import com.chat.bot.model.exceptions.NotFoundElementException;
+import com.chat.bot.model.exceptions.ValidationException;
+import com.chat.bot.model.repositories.Repositorys;
 import com.chat.bot.services.log.Logger;
 
 @Service
 public class NumberCash {
+
+    @Autowired
+    private Repositorys repositorys;
+
     private static Map<String, CashUser> cash;
 
     public static void RemoveCashPerTime(Logger log){
@@ -21,9 +30,11 @@ public class NumberCash {
         }
     }
 
-    public void addOrNextNumberToCash(String number, Integer next){
+    public void addOrNextNumberToCash(String number, Integer next, Optional<Usuarios> user) throws ValidationException{
         instanceMapIfNecessary(new HashMap<>());
-        addOrNext(number, next);
+        if(user.isPresent()){
+            addOrNext(number, next, user.get());
+        }
     }
 
     public Optional<Fluxo> getSequceNow(String number){
@@ -37,31 +48,42 @@ public class NumberCash {
         return Optional.ofNullable(fluxo);
     }
 
+    public CashUser getCashUser(String number) throws NotFoundElementException{
+        if(cash.containsKey(number)){
+            return cash.get(number);
+        }
+        throw new NotFoundElementException(number);
+    }
+
     private void instanceMapIfNecessary(Map<String, CashUser> maptypecash){
         if(cash == null){
             cash = maptypecash;
         }
     }
 
-    private void addOrNext(String number, Integer next){
+    private void addOrNext(String number, Integer next, Usuarios user) throws ValidationException{
         if(cash.containsKey(number)){
             next(number, next);
         }else{
-            add(number);
+            add(number, user);
         }
     }
 
-    //add o fluxo(buscar por init)
-    private void add(String number){
-        Fluxo fluxo = null;
+    private void add(String number, Usuarios user){
+        Fluxo fluxo = repositorys.getFluxoRepository().findByUsuarioAndInit(user, true);
         CashUser newUser = new CashUser(fluxo);
         cash.put(number, newUser);
     }
 
-    private void next(String number, Integer next){
+    private void next(String number, Integer next) throws ValidationException{
+        boolean isFinal = cash.get(number).getFluxo().getResposta().isEmpty();
         if(cash.get(number).getFluxo().getResposta().containsKey(next)){       
             Fluxo fluxo = cash.get(number).getFluxo().getResposta().get(next);
             cash.get(number).setFluxo(fluxo);
+        }else if(isFinal){
+            throw new ValidationException("Fim da conversa");
+        }else{
+            throw new ValidationException("resposta invalida");
         }
     }
 
