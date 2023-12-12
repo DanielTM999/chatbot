@@ -71,8 +71,10 @@ public class NumberCash {
 
     private void add(String number, Usuarios user){
         Fluxo fluxo = repositorys.getFluxoRepository().findByUsuarioAndInit(user, true);
-        CashUser newUser = new CashUser(fluxo);
-        cash.put(number, newUser);
+        if(fluxo != null){
+            CashUser newUser = new CashUser(fluxo);
+            cash.put(number, newUser);
+        }
     }
 
     private void next(String number, Integer next) throws ValidationException{

@@ -35,6 +35,10 @@ public class Usuarios {
    @JoinColumn(name = "credenciais_id")
    private Credenciais credenciais;
 
+   @OneToOne(cascade = CascadeType.ALL)
+   @JoinColumn(name = "wtskeys_id")
+   private WtsKeys keys;
+
    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
    private List<Fluxo> fluxo;
 

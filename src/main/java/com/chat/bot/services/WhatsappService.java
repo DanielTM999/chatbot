@@ -49,18 +49,27 @@ public class WhatsappService {
     public String next(Optional<Usuarios> user, Map<String, String> itens){
         String number = itens.get("number");
         Integer resposta = Integer.parseInt(itens.get("message"));
+        String respostaCliente = "Cliente Ainda não cadastrou o chatbot";
         try {
             cash.addOrNextNumberToCash(number, resposta, user);
-            CashUser cashUser = cash.getCashUser(number);
-            String respostaCliente = cashUser.getFluxo().getPergunta();
-            if(isRedirect(respostaCliente)){
-                //fazer o redirecionamento(Faço depois)
+            Optional<CashUser> cashUser = getCash(number);
+            if(cashUser.isPresent()){
+                respostaCliente = cashUser.get().getFluxo().getPergunta();
+                if(isRedirect(respostaCliente)){
+                    //fazer o redirecionamento(Faço depois)
+                }
+                
             }
-            return cashUser.getFluxo().getPergunta();
+            return respostaCliente;
         } catch (NotFoundElementException | ValidationException e) {
             return e.getMessage();
         }
         
+    }
+
+    private Optional<CashUser> getCash(String key) throws NotFoundElementException{
+        CashUser cashUser = cash.getCashUser(key);
+        return Optional.ofNullable(cashUser);
     }
     
     private boolean isRedirect(String value){
