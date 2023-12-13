@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class NodoFluxoDto {
+public class    NodoFluxoDto {
     
     @NotEmpty(message = "a pergunta não pode ser vazia")
     private String pergunta;

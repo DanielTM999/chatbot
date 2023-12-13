@@ -1,9 +1,11 @@
 package com.chat.bot.model.entitys;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "wtskeys")
+@Data
 public class WtsKeys {
 
     @Id
@@ -18,4 +20,10 @@ public class WtsKeys {
 
     @OneToOne(mappedBy = "keys", cascade = CascadeType.ALL)
     private Usuarios usuario;
+
+    @Override
+    public String toString() {
+        return "WtsKeys [id=" + id + ", apiKey=" + apiKey + ", apiToken=" + apiToken + "]";
+    }
+
 }

@@ -12,7 +12,7 @@ import com.chat.bot.model.dto.req.WhatsAppBusinessAccountDto;
 import com.chat.bot.model.entitys.Usuarios;
 import com.chat.bot.services.CredentialsExtractor;
 import com.chat.bot.services.WhatsappService;
-import com.chat.bot.services.cache.NumberCash;
+import com.chat.bot.services.log.Logger;
 
 @RestController
 public class WebHook {
@@ -21,17 +21,24 @@ public class WebHook {
     private CredentialsExtractor extractor;
 
     @Autowired
-    private NumberCash cash;
+    private WhatsappService whatsappService;
 
     @Autowired
-    private WhatsappService whatsappService;
+    private Logger log;
     
 
     @GetMapping("/webhook/{number}")
-    public String webHook(@PathVariable(name = "number") String number, @RequestBody WhatsAppBusinessAccountDto dto){
+    public void webHook(@PathVariable(name = "number") String number, @RequestBody WhatsAppBusinessAccountDto dto){
         Optional<Usuarios> user = extractor.extractDataUserByNumber(number); 
         Map<String, String> msg = whatsappService.getLatestMessageBody(dto);
-        String resposta = whatsappService.next(user, msg);
-        return resposta;
+        String sendNumber = msg.get("number");
+        String resposta;
+        try {
+            resposta = whatsappService.next(user, msg);
+            whatsappService.SendMessage(resposta, user.get(), sendNumber);
+            log.infoLog("sendNumber: "+ sendNumber+"\n"+"message: "+resposta);
+        } catch (Exception e) {
+            log.ErrorLog(e.getMessage(), getClass());
+        }
     }
 }

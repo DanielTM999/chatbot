@@ -55,6 +55,10 @@ public class NumberCash {
         throw new NotFoundElementException(number);
     }
 
+    public void removeExpect(String number){
+        cash.remove(number);
+    }
+
     private void instanceMapIfNecessary(Map<String, CashUser> maptypecash){
         if(cash == null){
             cash = maptypecash;
@@ -85,7 +89,9 @@ public class NumberCash {
         }else if(isFinal){
             throw new ValidationException("Fim da conversa");
         }else{
-            throw new ValidationException("resposta invalida");
+            Fluxo fluxo = cash.get(number).getFluxo();
+            fluxo.setPergunta("não entendi, "+fluxo.getPergunta());
+            cash.get(number).setFluxo(fluxo);
         }
     }
 
