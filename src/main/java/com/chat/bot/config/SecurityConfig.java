@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .requestMatchers("/public/**").permitAll()
                 .requestMatchers("/webhook/**").permitAll()
                 .requestMatchers("/chat/**").hasAuthority("BASIC")
+                .requestMatchers("/adm/**").hasAuthority("ADMIN")
                 .anyRequest().authenticated()
             )
         .build();
