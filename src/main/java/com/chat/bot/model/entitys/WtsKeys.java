@@ -18,6 +18,8 @@ public class WtsKeys {
     @Column(nullable = false)
     private String apiToken;
 
+    private String mainIdNumber;
+
     @OneToOne(mappedBy = "keys", cascade = CascadeType.ALL)
     private Usuarios usuario;
 

@@ -1,33 +1,45 @@
 package com.chat.bot.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.chat.bot.model.dto.req.AuthDto;
-import com.chat.bot.model.dto.res.JwtRes;
+
+import com.chat.bot.model.dto.res.AcountInfoRes;
+import com.chat.bot.model.entitys.Usuarios;
+import com.chat.bot.services.CredentialsExtractor;
 import com.chat.bot.services.Services;
-import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
-@RequestMapping("public/user")
+@RequestMapping("/user")
 public class UserController {
+
+    @Autowired
+    private CredentialsExtractor extractor;
 
     @Autowired
     private Services services;
     
-    @PostMapping("/auth")
-    public ResponseEntity<?> authorization(@Valid @RequestBody AuthDto req, BindingResult bindingResult){
-        try {
-            services.getValidation().isValid(bindingResult);
-            String token = services.getValidation().validationAuthCredencial(req.getCnpj(), req.getPassword());
-            return ResponseEntity.ok().body(new JwtRes(token, null));
-        } catch (Exception e) {
-            services.getLog().ErrorLog(e.getMessage(), req.getClass());
-            return ResponseEntity.badRequest().body(new JwtRes(null, e.getMessage()));
+    @DeleteMapping("/del/acount")
+    public void DeleteMyAcount(HttpServletRequest request){
+        Optional<Usuarios> user = extractor.extractDataUser(request);
+        if(user.isPresent()){
+            services.getUsuariosService().DeleteUser(user.get());
         }
     }
+
+    @GetMapping("/info/acount")
+    public ResponseEntity<AcountInfoRes> infoAcount(HttpServletRequest request) {
+        Optional<Usuarios> user = extractor.extractDataUser(request);
+        return ResponseEntity.ok().body(new AcountInfoRes(user));
+    }
+    
+
 }

@@ -29,14 +29,16 @@ public class WebHook {
 
     @GetMapping("/webhook/{number}")
     public void webHook(@PathVariable(name = "number") String number, @RequestBody WhatsAppBusinessAccountDto dto){
-        Optional<Usuarios> user = extractor.extractDataUserByNumber(number); 
-        Map<String, String> msg = whatsappService.getLatestMessageBody(dto);
-        String sendNumber = msg.get("number");
-        String resposta;
         try {
-            resposta = whatsappService.next(user, msg);
-            whatsappService.SendMessage(resposta, user.get(), sendNumber);
-            log.infoLog("sendNumber: "+ sendNumber+"\n"+"message: "+resposta);
+            Optional<Usuarios> user = extractor.extractDataUserByNumber(number); 
+            if(user.isPresent()){
+                Map<String, String> msg = whatsappService.getLatestMessageBody(dto);
+                String sendNumber = msg.get("number");
+                String resposta;
+                resposta = whatsappService.next(user, msg);
+                whatsappService.SendMessage(resposta, user.get(), sendNumber);
+                log.infoLog("sendNumber: "+ sendNumber+"\n"+"message: "+resposta);
+            }
         } catch (Exception e) {
             log.ErrorLog(e.getMessage(), getClass());
         }

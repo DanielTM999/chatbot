@@ -21,4 +21,7 @@ public class Services {
     @Autowired
     private AdmService admService;
 
+    @Autowired
+    private UsuariosService usuariosService;;
+
 }

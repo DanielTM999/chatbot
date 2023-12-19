@@ -53,6 +53,9 @@ public class WhatsappService {
     }
 
     public String next(Optional<Usuarios> user, Map<String, String> itens) throws Exception{
+        if (user.isEmpty()) {
+            throw new Exception("Usuario não encontrado");
+        }
         String number = itens.get("number");
         Integer resposta = Integer.parseInt(itens.get("message"));
         String respostaCliente = "Cliente Ainda não cadastrou o chatbot";
@@ -72,7 +75,7 @@ public class WhatsappService {
     }
 
     public void SendMessage(String message, Usuarios user, String numberToSend){
-        String businessPhoneNumber = user.getMainNumber();
+        String businessPhoneNumber = user.getKeys().getMainIdNumber();
         String authToken = user.getKeys().getApiToken();
         String endpoint = "https://graph.facebook.com/v18.0/" + businessPhoneNumber + "/messages";
         String requestBody = String.format(
