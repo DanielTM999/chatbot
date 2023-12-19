@@ -25,7 +25,6 @@ public class WebHook {
 
     @Autowired
     private Logger log;
-    
 
     @GetMapping("/webhook/{number}")
     public void webHook(@PathVariable(name = "number") String number, @RequestBody WhatsAppBusinessAccountDto dto){
