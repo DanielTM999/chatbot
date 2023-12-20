@@ -1,5 +1,6 @@
 HELP.md
-
+/target/
+PC.pem
 
 ### STS ###
 .apt_generated
