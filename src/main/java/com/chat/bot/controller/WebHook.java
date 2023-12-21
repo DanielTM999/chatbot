@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.chat.bot.model.dto.req.WhatsAppBusinessAccountDto;
@@ -26,7 +26,7 @@ public class WebHook {
     @Autowired
     private Logger log;
 
-    @GetMapping("/webhook/{number}")
+    @PostMapping("/webhook/{number}")
     public void webHook(@PathVariable(name = "number") String number, @RequestBody WhatsAppBusinessAccountDto dto){
         try {
             Optional<Usuarios> user = extractor.extractDataUserByNumber(number); 
@@ -35,8 +35,10 @@ public class WebHook {
                 String sendNumber = msg.get("number");
                 String resposta;
                 resposta = whatsappService.next(user, msg);
-                whatsappService.SendMessage(resposta, user.get(), sendNumber);
+                // whatsappService.SendMessage(resposta, user.get(), sendNumber);
                 log.infoLog("sendNumber: "+ sendNumber+"\n"+"message: "+resposta);
+            }else{
+                log.infoLog("sendNumber: "+ number+" cliente não encontrado referente a esse numero");
             }
         } catch (Exception e) {
             log.ErrorLog(e.getMessage(), getClass());
